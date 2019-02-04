@@ -5,7 +5,7 @@
             @foreach($rows as $row)
               <tr>
                   <td data-label="Type">
-                        <img src="{{ asset('/images/ic-outgoing-call-1.png') }}" width="24">
+                        <img src="{{ $row['image'] }}" width="24" />
                   </td>
                   <td data-label="From">
                         {{ $row['from_no'] }}

@@ -16,7 +16,6 @@ Route::post('login', 'LoginController@postLogin');
 
 Route::group(['middleware' => 'user_auth'], function() {
 	Route::get('/', 'WelcomeController@index');	
-
 	Route::any('api/data', 'WelcomeController@getApiData');
 	Route::any('api/get-active-calls', 'WelcomeController@getActiveCalls');		
 	Route::get('logout', 'LoginController@getLogout');

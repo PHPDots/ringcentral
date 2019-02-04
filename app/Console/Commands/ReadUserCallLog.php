@@ -41,7 +41,7 @@ class ReadUserCallLog extends Command
         $startDate = date("Y-m-d\T00:00:00O",strtotime("-1 Year"));
         $endDate = date("Y-m-d\T23:59:59O");
 
-        $perPage = 1;
+        $perPage = 100;
         $page = 1;
         $apiObject = new RingCentralApi();
 

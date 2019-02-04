@@ -1,3 +1,28 @@
+function initialLoadChart() {
+google.load("visualization", "1.1", {
+                packages: ["bar","corechart","treemap"],
+                callback: 'createChart'
+            });
+}
+
+function createChart()
+{
+    fillGridData();
+}
+
+function getActiveCalls(){    
+    $.ajax({
+        type: "GET",
+        url: '/api/get-active-calls',
+        success: function (result){
+            $("#active-calls-section").html(result);
+        },
+        error: function (error) {
+        }
+    });     
+}
+
+
 function fillGridData()
 {
 	var page = 1;
@@ -13,27 +38,15 @@ function fillGridData()
             {
             	$("#tbl-call-log tbody").html(result.data.gridHtml);
                 $("#tbl-call-log .pagination-section").html(result.data.paginationHTML);
-                // if(result.data.isNext == 1)
-                // {
-                //     $("#gridNextLink").removeClass("disabled");
-                //     $("#gridNextLink a").attr("data-page",result.data.nextPage);
-                // }
-                // else
-                // {
-                //     $("#gridNextLink").addClass("disabled");
-                // }
 
-                // if(result.data.isPrev == 1)
-                // {
-                //     $("#gridPrevLink").removeClass("disabled");
-                //     $("#gridPrevLink a").attr("data-page",result.data.prevPage);
-                // }
-                // else
-                // {
-                //     $("#gridPrevLink").addClass("disabled");
-                // }
-
-                // $("#currentActivePage").html("Page "+result.data.currentPage);
+                if($("#pageNo").val() == 1)
+                {
+                    drawChart(result.data.graph_data);
+                    for(var label in result.data.counter_data)
+                    {
+                        $("#"+label).html(result.data.counter_data[label]);
+                    }
+                }
             }
             else
             {
@@ -47,9 +60,54 @@ function fillGridData()
     });	
 }
 
+function drawChart(graphData)
+{
+    var formatedData = [];
+    formatedData.push(['Date', 'Inbound', 'Outbound', 'Connected', 'Missed', 'Rejected', 'Hang Up', 'No Answer', 'Busy']);
+    if(graphData.length > 0)
+    {
+        for(var i in graphData)
+        {
+           var d = new Date(graphData[i][0]);
+           var $created = d;
+           formatedData.push(
+            [
+                {f: graphData[i][0], v: $created},
+                parseFloat(graphData[i][1]), parseFloat(graphData[i][2]), parseFloat(graphData[i][3]), 
+                parseFloat(graphData[i][4]),parseFloat(graphData[i][5]), parseFloat(graphData[i][6]), 
+                parseFloat(graphData[i][7]), parseFloat(graphData[i][8])                
+            ]
+           )
+        }
+    }
+    else
+    {
+        formatedData.push([null, 0, 0, 0, 0, 0, 0, 0, 0]);
+    }    
+
+    var data = google.visualization.arrayToDataTable(formatedData);
+
+    var options = {      
+      curveType: 'function',
+      legend: {position: 'none'},
+      colors: ['#0070c0', '#7030a0', '#3c763d', '#ff0000', '#a94442', '#7f7f7f', '#ed7d31', '#000000'],
+      pointSize: 10,
+      chartArea:{width:"80%",height:"85%"}      
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('chart'));
+    chart.draw(data, options);    
+}
+
+
 $(document).ready(function(){
 
-	fillGridData();
+    initialLoadChart();	
+    getActiveCalls();
+
+    setInterval(function (){
+        getActiveCalls();        
+    },60000);        
 
     $(document).on("click",".page-link",function(){
 
@@ -92,6 +150,6 @@ $(document).ready(function(){
         }        
 
         $("#pageNo").val(1);
-        fillGridData();        
+        fillGridData();   
     });    
 });

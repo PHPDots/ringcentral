@@ -22,8 +22,7 @@
                                     </div>
                                     <div id="menu3" class="tab-pane fade">
                                         <div class="map-section">
-                                            <div id="map_div" style="height: 600px;"></div>                                            
-                                            <script src='https://maps.googleapis.com/maps/api/js'></script>
+                                            <div id="map_div" style="height: 600px;"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -40,5 +39,6 @@
 @endsection
 
 @section('scripts')
+<script src="//www.google.com/jsapi"></script>
 <script src="{{ asset('js/search.js') }}" type="text/javascript"></script>
 @endsection
