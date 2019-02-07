@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 use Validator;
 use App\RingCentralApi;
 use App\UserCallLog;
+use App\User;
 
 class WelcomeController extends Controller
 {
@@ -223,5 +225,119 @@ class WelcomeController extends Controller
 		}
 
     	return view("includes.activeCalls",["rows" => $callsData]);
-    }	
+    }
+
+    public function profile()
+    {
+    	$data = array();
+    	$data['authUser'] = \Auth::user();
+    	return view('profile',$data);
+    }
+
+    public function updateProfile(Request $request)
+    {
+    	$status = 1;
+    	$msg = 'Profile has been updated successfully!';
+
+    	$authUser = \Auth::user();
+    	$user = User::find($authUser->id);
+    	if(!$user){
+    		$status = 0;
+    		$msg = 'User not found';
+    	}
+    	$email = $request->get('email');
+        $name = $request->get('name');
+
+    	$rquestData = $request->all();
+    	$rquestData['email'] = trim($email);
+    	$rquestData['name'] = trim($name);
+
+        // check validations
+    	$validator = Validator::make($rquestData, [
+            'name' => 'required|min:2',            
+            'email' => 'required|email|unique:users,email,'.$authUser->id, 
+            'image' => 'image|max:4000',
+        ]);
+        if ($validator->fails())
+        {
+            $messages = $validator->messages();
+            
+            $status = 0;
+            $msg = "";
+            
+            foreach ($messages->all() as $message) 
+            {
+                $msg .= $message . "<br />";
+            }
+        }else{
+        	
+        	$image = $request->file('image');
+
+        	$user->name = $name;
+        	$user->email = $email;
+        	$user->save();
+
+        	if(!empty($image))
+            {
+                $destinationPath = public_path().DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'users';
+
+                $image_name =$image->getClientOriginalName();              
+                $extension =$image->getClientOriginalExtension();
+                $image_name=md5($image_name);
+                $profile_image= $image_name.'.'.$extension;
+                $file =$image->move($destinationPath,$profile_image);
+                
+                $user->image = $profile_image;
+                $user->save();
+            }
+        }
+        return ['status' => $status, 'msg' => $msg];
+    }
+
+    public function changePassword(Request $request)
+    {
+    	$status = 1;
+    	$msg = 'Password has been changed successfully!';
+
+    	$authUser = \Auth::user();
+    	$user = User::find($authUser->id);
+    	if(!$user){
+    		$status = 0;
+    		$msg = 'User not found';
+    	}
+
+        // check validations
+    	$validator = Validator::make($request->all(), [
+            'password_current' => 'required',
+            'password' => 'required|min:6|confirmed',
+            'password_confirmation' => 'required',
+        ]);
+        if ($validator->fails())
+        {
+            $messages = $validator->messages();
+            
+            $status = 0;
+            $msg = "";
+            
+            foreach ($messages->all() as $message) 
+            {
+                $msg .= $message . "<br />";
+            }
+        }else{
+        	
+        	$password_current = $request->get('password_current');
+        	$password = $request->get('password');
+        	if(Hash::check($password_current, $user->password))
+        	{
+	        	$user->password = bcrypt($password);
+	        	$user->save();
+        	}else
+            {
+                $status = 0;
+                $msg = 'Current password is incorrect.';
+            }
+
+        }
+        return ['status' => $status, 'msg' => $msg];
+    }
 }
