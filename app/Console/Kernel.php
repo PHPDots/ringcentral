@@ -14,6 +14,9 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         'App\Console\Commands\ReadUserCallLog',
+        'App\Console\Commands\ReadUsers',
+        'App\Console\Commands\ReadUserGroups',
+        'App\Console\Commands\UpdateLocation'
     ];
 
     /**

@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'googleKey' => "AIzaSyDtCnxWPyB8L_9UnQu_qcL6ZITMo_9qPuo",
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

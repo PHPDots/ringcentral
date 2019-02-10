@@ -18,6 +18,9 @@ class WelcomeController extends Controller
     function index(Request $request)
     {
         $data = [];
+        $data['users'] = \DB::table("ringcentral_users")
+        				 ->where("user_type","=","User")
+        				 ->get();        				 
         return view('home',$data);
     }
 
@@ -40,6 +43,7 @@ class WelcomeController extends Controller
 		$filterType = $request->get("filterType");
 		$isInbound = $request->get("isInbound",0);
 		$isOutbound = $request->get("isOutbound",0);
+		$filterUserType = $request->get("filterUserType");
 		$filter_sub_category = $request->get("filter_sub_category");		
 
 		$dateFrom = date("Y-m-d 00:00:00");
@@ -60,6 +64,11 @@ class WelcomeController extends Controller
 		if(!empty($filterType))
 		{
 			$model->where("type", $filterType);
+		}
+
+		// Filter By User
+		if(!empty($filterUserType) && $filterUserType != 'all'){
+			$model->where("extention", $filterUserType);
 		}
 
 		// Filter By Call Types/Result
@@ -112,6 +121,7 @@ class WelcomeController extends Controller
 		$counterOBJ = clone $model;
 		$counterOBJ1 = clone $model;
 		$counterOBJ2 = clone $model;
+		$counterOBJ3 = clone $model;
 
 		$model = $model->paginate($perPage);
 
@@ -154,6 +164,8 @@ class WelcomeController extends Controller
 			}
 		}
 
+		$locationData = UserCallLog::getLocationData($counterOBJ3);
+
 		
 
 		$callsData = [];
@@ -189,6 +201,7 @@ class WelcomeController extends Controller
 		$data['paginationHTML'] = view("includes.gridRows",["model" => $model,"only_pagination" => 1])->render();
 		$data['counter_data'] = $returnCounterData;
 		$data['graph_data'] = $graph_data;
+		$data['locationData'] = $locationData;
 		return ['status' => $status, 'msg' => $msg, 'data' => $data];
 	}	 
 

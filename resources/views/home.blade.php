@@ -6,6 +6,7 @@
         <input type="hidden" name="page" id="pageNo" value="1" />
         <input type="hidden" name="filterDate" id="searchDateRange" value="1" />
         <input type="hidden" name="filterType" id="searchType" value="Voice" />
+        <input type="hidden" name="filterUserType" id="searchUserType" value="all" />
         <section>
             <div class="container-fluid">
                 <div class="row">                    
@@ -40,5 +41,6 @@
 
 @section('scripts')
 <script src="//www.google.com/jsapi"></script>
+<script async defer src='//maps.googleapis.com/maps/api/js?key={{ \Config::get('app.googleKey')}}&callback=initMap'></script>
 <script src="{{ asset('js/search.js') }}" type="text/javascript"></script>
 @endsection

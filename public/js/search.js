@@ -1,3 +1,7 @@
+
+var map;
+var markers = [];
+
 function initialLoadChart() {
 google.load("visualization", "1.1", {
                 packages: ["bar","corechart","treemap"],
@@ -8,6 +12,18 @@ google.load("visualization", "1.1", {
 function createChart()
 {
     fillGridData();
+}
+
+function initMap() {
+    var elevator;
+    var myOptions = 
+    {
+        zoom: 1,
+        center: new google.maps.LatLng(0, 0),
+        mapTypeId: 'terrain'
+    };
+
+    map = new google.maps.Map($('#map_div')[0], myOptions);
 }
 
 function getActiveCalls(){    
@@ -22,6 +38,32 @@ function getActiveCalls(){
     });     
 }
 
+// Sets the map on all markers in the array.
+function setMapOnAll(map) {
+    for (var i = 0; i < markers.length; i++) {
+      markers[i].setMap(map);
+    }
+}
+
+// Removes the markers from the map, but keeps them in the array.
+function clearMarkers() {
+    setMapOnAll(null);
+}
+
+// Adds a marker to the map and push to the array.
+function addMarker(location) {
+    var marker = new google.maps.Marker({
+      position: location,
+      map: map
+    });
+    markers.push(marker);
+}
+
+ // Deletes all markers in the array by removing references to them.
+function deleteMarkers() {
+    clearMarkers();
+    markers = [];
+}
 
 function fillGridData()
 {
@@ -45,6 +87,13 @@ function fillGridData()
                     for(var label in result.data.counter_data)
                     {
                         $("#"+label).html(result.data.counter_data[label]);
+                    }
+
+                    deleteMarkers();
+
+                    for(var i in result.data.locationData){
+                        var latlng = new google.maps.LatLng(result.data.locationData[i].lat, result.data.locationData[i].lng);
+                        addMarker(latlng);
                     }
                 }
             }
@@ -99,7 +148,6 @@ function drawChart(graphData)
     chart.draw(data, options);    
 }
 
-
 $(document).ready(function(){
 
     initialLoadChart();	
@@ -107,7 +155,7 @@ $(document).ready(function(){
 
     setInterval(function (){
         getActiveCalls();        
-    },60000);        
+    },30000);
 
     $(document).on("click",".page-link",function(){
 
@@ -151,5 +199,24 @@ $(document).ready(function(){
 
         $("#pageNo").val(1);
         fillGridData();   
-    });    
+    });
+
+    $(document).on("click",".select-filter-byusers",function(){
+
+        $(".current-filter-byusers").text($(this).text());
+        $("#searchUserType").val($(this).attr("data-value"));
+
+        if($(this).attr("data-value") == "all")
+        {                        
+            $("#current-filter-byusers-img").attr("src","/images/ic-group.png");
+        }
+        else
+        {
+            $("#current-filter-byusers-img").attr("src","/images/user-pic-white.png");
+        }
+
+        $("#pageNo").val(1);
+        fillGridData();   
+    });
+
 });

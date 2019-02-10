@@ -20,6 +20,27 @@ class UserCallLog extends Model
     	return $data;
     }
 
+    public static function getLocationData($counterOBJ){
+
+        $data = [];
+        $counterOBJ->selectRaw("lat,lng,location");
+        $rows = $counterOBJ
+                ->whereRaw("lat IS NOT NULL AND lat != ''")
+                ->groupBy("location")
+                ->get()
+                ->toArray();
+
+        // $data[] = ['lat' => '29.974649','lng' => '-92.134293'];
+        // $data[] = ['lat' => '45.465141','lng' => '-98.488068'];
+        // $data[] = ['lat' => '32.448734','lng' => '-99.733147'];
+
+        foreach($rows as $row){
+            $data[] = ['lat' => $row->lat,'lng' => $row->lng];
+        }
+
+        // $data = array_unique($data);
+        return $data;
+    }    
     public static function getSubcategoryGraphData($counterOBJ){
 
         $counterOBJ2 = clone $counterOBJ;

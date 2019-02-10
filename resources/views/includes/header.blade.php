@@ -65,6 +65,7 @@
                             </div>
                         </div>
                     </li>
+                    <?php /*
                     <li>
                         <div class="dropdown dropdown-custom">
 
@@ -78,19 +79,31 @@
                             </div>
                         </div>
                     </li>
+                    */ ?>
                     <li>
                         <div class="dropdown dropdown-custom">
-
                             <button class="btn btn-secondary btn-drop dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="ic-img"><img src="{{ asset('/images/user-pic-white.png') }}" alt="Everyone" width="18"></span>   <span>Everyone</span> <span class="caret"></span>
+                                <span class="ic-img">
+                                    <img src="{{ asset('/images/ic-group.png') }}" alt="Everyone" width="18" id="current-filter-byusers-img" />
+                                </span>
+                                <span class="current-filter-byusers">Everyone</span> 
+                                <span class="caret"></span>
                             </button>
-
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item btn-lg" href="#">Everyone</a>
-                                <div class="divider"></div>
-                                <a class="dropdown-item btn-lg" href="#">Only me</a>
-                                <div class="divider"></div>
-                                <a class="dropdown-item btn-lg" href="#">Custom</a>
+                                <a class="dropdown-item btn-lg select-filter-byusers" data-value="all" href="javascript:void(0);">
+                                    Everyone
+                                </a>
+                                <div class="divider"></div>                                       
+                                @if(isset($users))
+                                    @foreach($users as $us)
+                                        @if(!empty($us->name))
+                                        <a class="dropdown-item btn-lg select-filter-byusers" data-value="{{ $us->api_id }}" href="javascript:void(0);">
+                                            {{ $us->name }}
+                                        </a>
+                                        <div class="divider"></div>       
+                                        @endif
+                                    @endforeach
+                                @endif
                             </div>
                         </div>
                     </li>

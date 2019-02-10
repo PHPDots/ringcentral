@@ -4,7 +4,7 @@ $(function () {
         $('.menu-drawer').toggleClass("open");
     });
 
-    var start = moment();
+    var start = moment().subtract(6,'d');
     var end = moment();
     var iCounter = 1;
 
