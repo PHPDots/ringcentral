@@ -14,7 +14,7 @@ $(document).ready(function () {
                 if (result.status == 1)
                 {
                     $.bootstrapGrowl(result.msg, {type: 'success', delay: 4000});
-                    window.location = '/';
+                    window.location = $('#login-frm').attr('redirect-url');
                 }
                 else
                 {

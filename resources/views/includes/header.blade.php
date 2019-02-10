@@ -110,13 +110,18 @@
                     <li>
                         <div class="dropdown user-profile profile-view">                                
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <img src="{{ asset('/images/user-pic-1.png') }}" alt="user" width="40" class="img-profile">
+                                @if(!empty(\Auth::user()->image))
+                                    <?php $img = asset('uploads/users/'.\Auth::user()->image); ?>
+                                @else    
+                                    <?php $img = asset('images/default-medium.png'); ?>
+                                @endif
+                                <img src="{{ $img }}" alt="user" width="40" class="img-profile">
                                 <span class="user-name btn-lg">{{ \Auth::user()->name }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-custom">
                                 <li>
                                     <div class="navbar-content">
-                                        <a href="#" class="view btn-lg text-capitalize active">view Profile</a>
+                                        <a href="{{ route('profile') }}" class="view btn-lg text-capitalize active">view Profile</a>
                                         <div class="divider">
                                         </div>
                                         <a href="{{ url('logout') }}" class="view btn-lg text-capitalize active">Log out</a>

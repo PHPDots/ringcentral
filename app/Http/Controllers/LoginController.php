@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Admin;
 use App\User;
+use App\Custom;
 use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -106,5 +107,120 @@ class LoginController extends Controller
 	   // logout user
        Auth::logout();
        return redirect($this->redirectAfterLogout);
-    }            
+    }  
+
+    public function forgotPassword()
+    {
+        return view('before_login.forgotPassword');
+    }
+
+    public function forgotPasswordData(Request $request)
+    {
+        $status = 1;
+        $msg = "We have sent you an email so that you can restore your password. Please check your mail.";
+
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email', 
+        ]);        
+        
+        // check validations
+        if ($validator->fails()) 
+        {
+            $messages = $validator->messages();
+            
+            $status = 0;
+            $msg = "";
+            
+            foreach ($messages->all() as $message) 
+            {
+                $msg .= $message . "<br />";
+            }
+        }else{
+            $email = $request->get('email');
+            $user = User::where('email',$email)->first();
+            
+            if(!$user){
+                $status = 0;
+                $msg = "Email is not correct. Enter one correctly";
+            }else{
+
+                $key = \App\Custom::generatePassword(12);
+                $user->reset_password_token = $key;
+                $user->save();
+
+                // send email to user
+                $email = trim($user->email);
+                $subject = 'Forgotten password';
+                $path = route('resetPassword',['id'=>$user->id,'key'=>$key]);
+ 
+                $message = array();
+                $message['name'] = ucwords($user->name);
+                $message['path'] = $path;
+
+                $returnHTML = view('emails.forgotPassword',$message)->render();
+                $params["to"]=$email;
+                $params["subject"] = $subject;
+                $params["body"] = $returnHTML;
+                Custom::sendHtmlMail($params);
+            }
+        }
+        return ['status' => $status, 'msg' => $msg];
+    }
+    public function resetPassword($id,$key)
+    {
+        $user = User::where('id',$id)->where('reset_password_token',$key)->first();
+        if(!$user)
+        {
+            return redirect('/');
+        }
+        else
+        {
+            $data = array();
+            $data['key'] = $id.'/'.$key;
+            return view('before_login.resetPassword',$data);
+        }
+
+    }
+    public function resetPasswordData(Request $request)
+    {
+        $status = 1;
+        $msg = 'Password has been updated successfully!';
+
+        $keys = $request->get('key');
+        $keys = explode('/', $keys);
+        $id = isset($keys[0])?$keys[0]:'';
+        $key = isset($keys[1])?$keys[1]:'';
+        
+        $user = User::where('id',$id)->where('reset_password_token',$key)->first();
+        if(!$user){
+            $status = 0;
+            $msg = 'User not found';
+        }
+
+        // check validations
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|min:6|confirmed',            
+            'password_confirmation' => 'required',
+        ]);
+        if ($validator->fails())
+        {
+            $messages = $validator->messages();
+            
+            $status = 0;
+            $msg = "";
+            
+            foreach ($messages->all() as $message) 
+            {
+                $msg .= $message . "<br />";
+            }
+        }else{
+            
+            $password = $request->get('password');
+
+            $user->password = bcrypt($password);
+            $user->reset_password_token = NULL;
+            $user->save();
+        }
+        return ['status' => $status, 'msg' => $msg];
+    }
 }

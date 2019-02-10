@@ -49,6 +49,7 @@
         <script src="{{ asset('js/jquery-ui.js') }}" type="text/javascript"></script>
         <script src="{{ asset('js/jquery.bootstrap-growl.min.js') }}" type="text/javascript"></script>
         <script src="{{ asset('js/custom.js') }}" type="text/javascript"></script>        
+        <script src="{{ asset('js/submitForm.js') }}" type="text/javascript"></script>        
         @yield('scripts')
     </body>
 </html>
