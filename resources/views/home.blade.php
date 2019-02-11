@@ -7,6 +7,8 @@
         <input type="hidden" name="filterDate" id="searchDateRange" value="1" />
         <input type="hidden" name="filterType" id="searchType" value="Voice" />
         <input type="hidden" name="filterUserType" id="searchUserType" value="all" />
+        <input type="hidden" name="filterGroupType" id="filterGroupType" value="all" />
+        <input type="hidden" name="filterByPhone" id="filterByPhone" value="" />
         <section>
             <div class="container-fluid">
                 <div class="row">                    

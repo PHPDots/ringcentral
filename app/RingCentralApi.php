@@ -86,6 +86,19 @@ class RingCentralApi
     }    
 
     /**
+     * Get List Of Group Users
+     * @param  int  $groupID
+     * @return array
+     */
+    public function getGroupUsers($groupID)
+    {
+        $params['perPage'] = 100;
+        $apiResponse = $this->platform->get('/account/~/department/'.$groupID.'/members', $params);
+        $res = json_decode(json_encode($apiResponse->json()),1);
+        return $res;
+    }    
+
+    /**
      * Get User Active Calls
      * @param  mixed  $params
      * @return array

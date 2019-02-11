@@ -84,6 +84,7 @@ function fillGridData()
                 if($("#pageNo").val() == 1)
                 {
                     drawChart(result.data.graph_data);
+
                     for(var label in result.data.counter_data)
                     {
                         $("#"+label).html(result.data.counter_data[label]);
@@ -219,4 +220,27 @@ $(document).ready(function(){
         fillGridData();   
     });
 
+    $(document).on("change","#searchByPhone",function(){
+        $("#filterByPhone").val($(this).val());
+        $("#pageNo").val(1);
+        fillGridData();
+    });
+
+    $(document).on("click",".select-filter-bygroups",function(){
+
+        $(".current-filter-bygroups").text($(this).text());
+        $("#filterGroupType").val($(this).attr("data-value"));
+
+        if($(this).attr("data-value") == "all")
+        {                        
+            $("#current-filter-bygroups-img").attr("src","/images/ic-group.png");
+        }
+        else
+        {
+            $("#current-filter-bygroups-img").attr("src","/images/user-pic-white.png");
+        }
+
+        $("#pageNo").val(1);
+        fillGridData();
+    });
 });

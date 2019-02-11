@@ -47,8 +47,35 @@ class ReadUserGroups extends Command
         $filterParams['perPage'] = $perPage;                
         $groups = $apiObject->getAllGroups($filterParams);
 
-        print_r($groups);
-        exit;
+        if(isset($groups['records']))
+        {
+            foreach($groups['records'] as $group)
+            {                
+                $groupID = $group['id'];
+
+                echo "\n Group: $groupID";
+
+                $userOBJ = \DB::table("ringcentral_users")
+                            ->where("api_id", $groupID)
+                            ->first();
+
+                if($userOBJ)
+                {
+                    $users = $apiObject->getGroupUsers($groupID);                
+                    if(isset($users['records']))
+                    {
+                        foreach($users['records'] as $user)
+                        {
+                            $extensionNumber = $user['extensionNumber'];
+                            echo "\n User: $extensionNumber";
+                            \DB::table("ringcentral_users")
+                            ->where("extension", $extensionNumber)
+                            ->update(['parent_id' => $userOBJ->id]);
+                        }
+                    }
+                }            
+            }
+        }
         
         $this->info("\nCommand has been run!\n");
     }

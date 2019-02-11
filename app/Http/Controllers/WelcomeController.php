@@ -23,6 +23,11 @@ class WelcomeController extends Controller
         $data['users'] = \DB::table("ringcentral_users")
         				 ->where("user_type","=","User")
         				 ->get();        				 
+
+        $data['groups'] = \DB::table("ringcentral_users")
+        				 ->where("user_type","=","Department")
+        				 ->get();        				         				 
+
         return view('home',$data);
     }
 
@@ -46,11 +51,12 @@ class WelcomeController extends Controller
 		$isInbound = $request->get("isInbound",0);
 		$isOutbound = $request->get("isOutbound",0);
 		$filterUserType = $request->get("filterUserType");
-		$filter_sub_category = $request->get("filter_sub_category");		
-
+		$filterGroupType = $request->get("filterGroupType");
+		$filterByPhone = $request->get("filterByPhone");
+		$filter_sub_category = $request->get("filter_sub_category");
 		$dateFrom = date("Y-m-d 00:00:00");
 		$dateTo = date("Y-m-d 23:59:59");
-
+		$extentions = [];
 
 		// Filter By Date
 		if(!empty($filterDate)){
@@ -59,7 +65,8 @@ class WelcomeController extends Controller
 				$dateFrom = date("Y-m-d 00:00:00",strtotime($filterDates[0]));
 				$dateTo = date("Y-m-d 23:59:59",strtotime($filterDates[1]));				
 			}
-		}	
+		}
+
 		$model = UserCallLog::whereBetween("start_time",[$dateFrom, $dateTo]);		
 
 		// Filter By Type
@@ -69,8 +76,33 @@ class WelcomeController extends Controller
 		}
 
 		// Filter By User
-		if(!empty($filterUserType) && $filterUserType != 'all'){
-			$model->where("extention", $filterUserType);
+		if(!empty($filterUserType) && $filterUserType != 'all')
+		{
+			$extentions[] = $filterUserType;
+		}
+
+		// Filter By Group
+		if(!empty($filterGroupType) && $filterGroupType != 'all'){
+
+			$users = \DB::table("ringcentral_users")
+						->where("parent_id", $filterGroupType)
+						->get();
+
+			if($users)
+			{
+				foreach($users as $user)
+				{
+					$extentions[] = $user->api_id;
+				}				
+			}						
+		}
+
+		if(count($extentions) > 0)
+		$model->whereIn("extention", $extentions);
+
+		if(!empty($filterByPhone)){
+			$filterByPhone = addslashes($filterByPhone);
+			$model->whereRaw("(from_number LIKE '%$filterByPhone%' OR to_number LIKE '%$filterByPhone%')");									
 		}
 
 		// Filter By Call Types/Result

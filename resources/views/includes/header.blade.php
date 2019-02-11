@@ -32,7 +32,7 @@
                 <div class="search-section pull-left">
                     <div class="search-input" id="input_show">
                         <div class="form-group form-group-lg">
-                            <input type="text" name="search" class="form-control form-group-lg log-search"  placeholder="Search..">
+                            <input type="text" name="search" class="form-control form-group-lg log-search"  placeholder="Search By Phone" id="searchByPhone"/>
                         </div>
                     </div>                    
                     <div class="mobile-search" id="btn_show">                           
@@ -65,21 +65,35 @@
                             </div>
                         </div>
                     </li>
-                    <?php /*
+                    
                     <li>
                         <div class="dropdown dropdown-custom">
 
                             <button class="btn btn-secondary btn-drop btn-group dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="ic-img"><img src="{{ asset('/images/ic-group.png') }}" alt="Everyone" width="28"></span>  <span>All Group</span> <span class="caret"></span>
+                                <span class="ic-img">
+                                    <img src="{{ asset('/images/ic-group.png') }}" alt="Everyone" 
+                                    width="28" id="current-filter-bygroups-img" />
+                                </span>  
+                                <span class="current-filter-bygroups">All Groups</span> 
+                                <span class="caret"></span>
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item btn-lg" href="#">All Group</a>                                      
+                                <a class="dropdown-item btn-lg select-filter-bygroups" data-value="all" 
+                                href="javascript:void(0);">
+                                    All Groups
+                                </a>
                                 <div class="divider"></div>
-                                <a class="dropdown-item btn-lg" href="#">Only me</a>
+                                @foreach($groups as $group)
+                                        @if(!empty($group->name))
+                                        <a class="dropdown-item btn-lg select-filter-bygroups" data-value="{{ $group->id }}" href="javascript:void(0);">
+                                            {{ $group->name }}
+                                        </a>
+                                        <div class="divider"></div>       
+                                        @endif
+                                @endforeach
                             </div>
                         </div>
-                    </li>
-                    */ ?>
+                    </li>                    
                     <li>
                         <div class="dropdown dropdown-custom">
                             <button class="btn btn-secondary btn-drop dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
